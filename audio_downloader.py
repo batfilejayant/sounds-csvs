@@ -69,8 +69,8 @@ def find_and_process_csvs(main_folder):
 
 def main():
     # Define the paths of two main folders
-    main_folder1 = 'C:/Users/Asus/Desktop/jayant/Capstone Project/emergency sounds'  # Path to the first main folder
-    main_folder2 = 'C:/Users/Asus/Desktop/jayant/Capstone Project/normal sounds'  # Path to the second main folder
+    main_folder1 = './emergency sounds'  # Path to the first main folder
+    main_folder2 = './normal sounds'  # Path to the second main folder
 
     # Process CSV files from both main folders
     print(f"Processing folder: {main_folder1}")
