@@ -6,7 +6,16 @@ import csv
 def get_video_id(url):
     return url.split('v=')[1]
 
+def count_files_in_directory(directory):
+    """Count the number of files in a directory."""
+    return sum(len(files) for _, _, files in os.walk(directory))
+
 def extract_audio_segment(video_id, start_time, end_time, output_folder):
+    # Check if the total number of files in the output folder is less than 1004
+    if count_files_in_directory(output_folder) >= 1004:
+        print(f"Total number of files in {output_folder} has reached or exceeded 1004. Skipping video {video_id}.")
+        return
+
     # yt-dlp options to download the best audio
     ydl_opts = {
         'format': 'bestaudio/best',
@@ -65,8 +74,8 @@ def find_and_process_csvs(main_folder):
     # Walk through all directories and files in the main folder
     for root, dirs, files in os.walk(main_folder):
         for file in files:
-            # Check if the file ends with 'random_rows.csv'
-            if file.endswith('download.csv'):
+            # Check if the file ends with 'download.csv'
+            if file.startswith('Processed'):
                 csv_path = os.path.join(root, file)
                 print(f"Found CSV file: {csv_path}")
                 process_csv(csv_path)
@@ -74,7 +83,7 @@ def find_and_process_csvs(main_folder):
 def main():
     # Define the paths of two main folders
     main_folder1 = './emergency sounds'  # Path to the first main folder
-    main_folder2 = './normal sounds'  # Path to the second main folder
+    main_folder2 = './normal sounds'      # Path to the second main folder
 
     # Process CSV files from both main folders
     print(f"Processing folder: {main_folder1}")
