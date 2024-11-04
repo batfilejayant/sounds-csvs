@@ -74,8 +74,8 @@ def find_and_process_csvs(main_folder):
     # Walk through all directories and files in the main folder
     for root, dirs, files in os.walk(main_folder):
         for file in files:
-            # Check if the file ends with 'download.csv'
-            if file.startswith('Processed'):
+            # Check if the file starts with 'processed' and ends with '.csv'
+            if file.endswith('.csv'):
                 csv_path = os.path.join(root, file)
                 print(f"Found CSV file: {csv_path}")
                 process_csv(csv_path)
