@@ -2,6 +2,7 @@ import yt_dlp
 from pydub import AudioSegment
 import os
 import csv
+from concurrent.futures import ProcessPoolExecutor, as_completed
 
 def get_video_id(url):
     return url.split('v=')[1]
@@ -50,8 +51,8 @@ def extract_audio_segment(video_id, start_time, end_time, output_folder):
         print(f"Error processing video {video_id}: {str(e)}")
 
 def process_csv(csv_file):
-    # Get the directory of the CSV file to save the WAV files in the same folder
     csv_folder = os.path.dirname(csv_file)
+    tasks = []
 
     with open(csv_file, newline='', encoding='utf-8') as file:
         reader = csv.DictReader(file)
@@ -59,16 +60,21 @@ def process_csv(csv_file):
 
         for row in reader:
             video_id = row['# YTID'].strip()
-
             try:
                 start_time = float(row[' start_seconds'].strip())
                 end_time = float(row[' end_seconds'].strip())
+                tasks.append((video_id, start_time, end_time, csv_folder))
             except ValueError:
                 print(f"Skipping video {video_id}: Invalid start or end time.")
                 continue
 
-            print(f"Processing video: {video_id}, start: {start_time}, end: {end_time}")
-            extract_audio_segment(video_id, start_time, end_time, csv_folder)
+    # Parallel processing
+    with ProcessPoolExecutor(max_workers=50) as executor:
+        futures = [executor.submit(extract_audio_segment, *task) for task in tasks]
+        for future in as_completed(futures):
+            future.result()  # Retrieve results or handle exceptions
+
+
 
 def find_and_process_csvs(main_folder):
     # Walk through all directories and files in the main folder
